@@ -1,0 +1,62 @@
+name: Release plugin
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - version.txt
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  package-and-release:
+    runs-on: windows-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.18.0
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Read release version
+        id: version
+        shell: pwsh
+        run: |
+          $version = (Get-Content -Raw version.txt).Trim()
+          if ($version -notmatch '^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$') {
+            throw 'version.txt does not contain a valid semantic version.'
+          }
+          "version=$version" >> $env:GITHUB_OUTPUT
+
+      - name: Test, build, and package plugin
+        shell: pwsh
+        run: ./scripts/package-plugin.ps1
+
+      - name: Publish GitHub release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          gh release create $env:RELEASE_VERSION `
+            "artifacts/dev.masterain.cider-netease-lyrics-$env:RELEASE_VERSION.zip" `
+            "artifacts/dev.masterain.cider-netease-lyrics-$env:RELEASE_VERSION.zip.sha256" `
+            --title $env:RELEASE_VERSION `
+            --target $env:GITHUB_SHA `
+            --generate-notes

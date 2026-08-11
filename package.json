@@ -1,0 +1,20 @@
+{
+  "name": "cider-netease-lyrics",
+  "version": "0.6.10",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.18.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "pnpm -r --if-present build",
+    "test": "pnpm -r --if-present test",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "check": "pnpm build && pnpm typecheck && pnpm test",
+    "dev:gateway": "pnpm --filter @cider-netease/gateway dev",
+    "dev:plugin": "pnpm --filter @cider-netease/plugin dev",
+    "package:plugin": "pwsh -NoProfile -File ./scripts/package-plugin.ps1",
+    "prepare-marketplace": "pnpm package:plugin"
+  }
+}

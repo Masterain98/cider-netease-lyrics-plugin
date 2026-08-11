@@ -1,0 +1,12 @@
+services:
+  gateway:
+    build:
+      context: .
+      dockerfile: gateway/Dockerfile
+    environment:
+      GATEWAY_HOST: 0.0.0.0
+      GATEWAY_PORT: 3100
+      CORS_ORIGINS: http://127.0.0.1:10767,http://localhost:10767,http://127.0.0.1:3058,http://localhost:3058
+    ports:
+      - "127.0.0.1:3100:3100"
+    restart: unless-stopped

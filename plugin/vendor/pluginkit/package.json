@@ -1,0 +1,22 @@
+{
+  "name": "@ciderapp/pluginkit",
+  "version": "1.0.1-vendored.bff8733",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "source": "https://github.com/ciderapp/PluginKit/commit/bff8733dd59a1fd5e2ab172c13f87670b308cfae",
+  "exports": {
+    ".": {
+      "types": "./build/index.d.ts",
+      "import": "./build/index.mjs"
+    },
+    "./vue/*.vue": {
+      "import": "./build/vue/*.vue"
+    },
+    "./types": {
+      "import": "./build/api/ciderapi-types/*.ts"
+    }
+  },
+  "module": "./build/index.mjs",
+  "types": "./build/index.d.ts"
+}

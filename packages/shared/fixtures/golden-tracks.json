@@ -1,0 +1,155 @@
+[
+  {
+    "name": "Chinese pop without translation",
+    "tags": ["chinese", "no-translation"],
+    "track": { "title": "光年之外", "artist": "G.E.M.邓紫棋", "album": "光年之外", "durationMs": 235000 },
+    "expected": { "neteaseId": "449818741", "title": "光年之外", "artists": ["G.E.M.邓紫棋"], "album": "光年之外", "durationMs": 235505 },
+    "decoys": [
+      { "neteaseId": "486194122", "title": "光年之外", "artists": ["G.E.M.邓紫棋", "余赛亚"], "album": "我想和你唱 第二季 第9期", "durationMs": 182177 }
+    ]
+  },
+  {
+    "name": "English pop",
+    "tags": ["english", "translated"],
+    "track": { "title": "Hello", "artist": "Adele", "album": "25", "durationMs": 295000 },
+    "expected": { "neteaseId": "36841430", "title": "Hello", "artists": ["Adele"], "album": "25", "durationMs": 295502 },
+    "decoys": [
+      { "neteaseId": "16423632", "title": "Hello", "artists": ["Lionel Richie"], "album": "Can't Slow Down", "durationMs": 246933 }
+    ]
+  },
+  {
+    "name": "Japanese with romanization",
+    "tags": ["japanese", "romanization"],
+    "track": { "title": "夜に駆ける", "artist": "YOASOBI", "album": "THE BOOK", "durationMs": 261000 },
+    "expected": { "neteaseId": "1500151583", "title": "夜に駆ける", "artists": ["YOASOBI"], "album": "THE BOOK", "durationMs": 258840 },
+    "decoys": [
+      { "neteaseId": "1409311773", "title": "夜に駆ける", "artists": ["YOASOBI"], "album": "夜に駆ける", "durationMs": 261013 }
+    ]
+  },
+  {
+    "name": "Korean pop",
+    "tags": ["korean", "translated"],
+    "track": { "title": "Love wins all", "artist": "IU", "album": "The Winning", "durationMs": 271000 },
+    "expected": { "neteaseId": "2128223741", "title": "Love wins all", "artists": ["IU"], "album": "The Winning", "durationMs": 271080 },
+    "decoys": [
+      { "neteaseId": "2120465975", "title": "Love wins all", "artists": ["IU"], "album": "Love wins all", "durationMs": 271080 }
+    ]
+  },
+  {
+    "name": "Multi-artist collaboration",
+    "tags": ["multi-artist"],
+    "track": { "title": "See You Again", "artist": "Wiz Khalifa feat. Charlie Puth", "album": "Furious 7: Original Motion Picture Soundtrack (Deluxe)", "durationMs": 229000 },
+    "expected": { "neteaseId": "30953009", "title": "See You Again", "artists": ["Wiz Khalifa", "Charlie Puth"], "album": "Furious 7: Original Motion Picture Soundtrack (Deluxe)", "durationMs": 229525 },
+    "decoys": [
+      { "neteaseId": "401722227", "title": "See You Again", "artists": ["Charlie Puth", "Wiz Khalifa"], "album": "Nine Track Mind", "durationMs": 229525 }
+    ]
+  },
+  {
+    "name": "Same-title disambiguation",
+    "tags": ["same-title"],
+    "track": { "title": "Hello", "artist": "Lionel Richie", "album": "Can't Slow Down", "durationMs": 247000 },
+    "expected": { "neteaseId": "16423632", "title": "Hello", "artists": ["Lionel Richie"], "album": "Can't Slow Down", "durationMs": 246933 },
+    "decoys": [
+      { "neteaseId": "36841430", "title": "Hello", "artists": ["Adele"], "album": "25", "durationMs": 295502 }
+    ]
+  },
+  {
+    "name": "Live recording",
+    "tags": ["live"],
+    "track": { "title": "Hotel California (Live on MTV, 1994)", "artist": "Eagles", "album": "Hell Freezes Over", "durationMs": 432000 },
+    "expected": { "neteaseId": "4049399", "title": "Hotel California (Live on MTV, 1994)", "artists": ["Eagles"], "album": "Hell Freezes Over", "durationMs": 432040 },
+    "decoys": [
+      { "neteaseId": "16415435", "title": "Hotel California", "artists": ["Eagles"], "album": "Hotel California", "durationMs": 391000 }
+    ]
+  },
+  {
+    "name": "Remastered recording",
+    "tags": ["remastered"],
+    "track": { "title": "Her Majesty (Remastered)", "artist": "The Beatles", "album": "Abbey Road (Remastered)", "durationMs": 26000 },
+    "expected": { "neteaseId": "4336380", "title": "Her Majesty (Remastered)", "artists": ["The Beatles"], "album": "Abbey Road (Remastered)", "durationMs": 25986 },
+    "decoys": [
+      { "neteaseId": "1393545479", "title": "Her Majesty (2019 Mix)", "artists": ["The Beatles"], "album": "Abbey Road (2019 Mix)", "durationMs": 25120 }
+    ]
+  },
+  {
+    "name": "Acoustic version",
+    "tags": ["acoustic"],
+    "track": { "title": "Everlong (Acoustic Version)", "artist": "Foo Fighters", "album": "Greatest Hits", "durationMs": 252000 },
+    "expected": { "neteaseId": "17832176", "title": "Everlong (Acoustic Version)", "artists": ["Foo Fighters"], "album": "Greatest Hits", "durationMs": 252177 },
+    "decoys": [
+      { "neteaseId": "21019085", "title": "Everlong", "artists": ["Foo Fighters"], "album": "The Colour And The Shape", "durationMs": 250000 }
+    ]
+  },
+  {
+    "name": "Instrumental track",
+    "tags": ["instrumental", "no-translation"],
+    "track": { "title": "Intro", "artist": "The xx", "album": "xx", "durationMs": 128000 },
+    "expected": { "neteaseId": "4341314", "title": "Intro", "artists": ["The xx"], "album": "xx", "durationMs": 127920 },
+    "decoys": [
+      { "neteaseId": "26655232", "title": "Intro", "artists": ["The xx"], "album": "COOL (The Future Sound of Music)", "durationMs": 127988 }
+    ]
+  },
+  {
+    "name": "Single release",
+    "tags": ["single"],
+    "track": { "title": "Hello", "artist": "Adele", "album": "Hello - Single", "durationMs": 296000 },
+    "expected": { "neteaseId": "35847388", "title": "Hello", "artists": ["Adele"], "album": "Hello", "durationMs": 295502 },
+    "decoys": [
+      { "neteaseId": "16423632", "title": "Hello", "artists": ["Lionel Richie"], "album": "Can't Slow Down", "durationMs": 246933 }
+    ]
+  },
+  {
+    "name": "Deluxe album",
+    "tags": ["deluxe"],
+    "track": { "title": "The Sound of Silence", "artist": "Disturbed", "album": "Immortalized (Deluxe Edition)", "durationMs": 248000 },
+    "expected": { "neteaseId": "34125287", "title": "The Sound of Silence", "artists": ["Disturbed"], "album": "Immortalized (Deluxe Edition)", "durationMs": 248466 },
+    "decoys": [
+      { "neteaseId": "1313304670", "title": "The Sound of Silence", "artists": ["Disturbed"], "album": "Immortalized", "durationMs": 248466 }
+    ]
+  },
+  {
+    "name": "Expanded mix edition",
+    "tags": ["expanded", "mix"],
+    "track": { "title": "Let It Be (2021 Mix)", "artist": "The Beatles", "album": "Let It Be (Super Deluxe)", "durationMs": 243000 },
+    "expected": { "neteaseId": "1887200356", "title": "Let It Be (2021 Mix)", "artists": ["The Beatles"], "album": "Let It Be (Super Deluxe)", "durationMs": 243173 },
+    "decoys": [
+      { "neteaseId": "1887200388", "title": "Let It Be (Single Version / 2021 Mix)", "artists": ["The Beatles"], "album": "Let It Be (Super Deluxe)", "durationMs": 232706 }
+    ]
+  },
+  {
+    "name": "No-lyrics composition",
+    "tags": ["no-lyrics"],
+    "track": { "title": "4'33''", "artist": "John Cage", "album": "4'33''", "durationMs": 273000 },
+    "expected": { "neteaseId": "1359683396", "title": "4'33''", "artists": ["John Cage"], "album": "4'33''", "durationMs": 273066 },
+    "decoys": [
+      { "neteaseId": "469272851", "title": "4'33 (Felix Cartal Remix)", "artists": ["Felix Cartal", "John Cage"], "album": "4'33 (Felix Cartal Remix)", "durationMs": 273136 }
+    ]
+  },
+  {
+    "name": "Long song",
+    "tags": ["long"],
+    "track": { "title": "All Too Well (10 Minute Version) (Taylor's Version) (From The Vault)", "artist": "Taylor Swift", "album": "Red (Taylor's Version)", "durationMs": 613000 },
+    "expected": { "neteaseId": "1891456146", "title": "All Too Well (10 Minute Version) (Taylor's Version) (From The Vault)", "artists": ["Taylor Swift"], "album": "Red (Taylor's Version)", "durationMs": 613000 },
+    "decoys": [
+      { "neteaseId": "1900000000", "title": "All Too Well", "artists": ["Taylor Swift"], "album": "Red", "durationMs": 329000 }
+    ]
+  },
+  {
+    "name": "Very short song",
+    "tags": ["short"],
+    "track": { "title": "Her Majesty (Remastered)", "artist": "The Beatles", "album": "Abbey Road (Remastered)", "durationMs": 26000 },
+    "expected": { "neteaseId": "4336380", "title": "Her Majesty (Remastered)", "artists": ["The Beatles"], "album": "Abbey Road (Remastered)", "durationMs": 25986 },
+    "decoys": [
+      { "neteaseId": "1468069298", "title": "Her Majesty", "artists": ["The Beatles Complete On Ukulele", "Jon Albrink"], "album": "Abbey Road", "durationMs": 142040 }
+    ]
+  },
+  {
+    "name": "Korean studio versus live",
+    "tags": ["korean", "live-decoy"],
+    "track": { "title": "How You Like That", "artist": "BLACKPINK", "album": "THE ALBUM", "durationMs": 181000 },
+    "expected": { "neteaseId": "1484052702", "title": "How You Like That", "artists": ["BLACKPINK"], "album": "THE ALBUM", "durationMs": 180956 },
+    "decoys": [
+      { "neteaseId": "1849410078", "title": "How You Like That (Live)", "artists": ["BLACKPINK"], "album": "BLACKPINK 2021 'THE SHOW' LIVE", "durationMs": 179438 }
+    ]
+  }
+]
