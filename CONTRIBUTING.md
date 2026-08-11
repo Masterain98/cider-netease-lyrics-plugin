@@ -4,7 +4,7 @@ Thanks for helping improve NetEase Bilingual Lyrics for Cider. Please keep chang
 
 ## Prerequisites
 
-- Node.js 22 or newer
+- Node.js 24 LTS or newer
 - pnpm 11.18.0 through Corepack
 - PowerShell 7 for release packaging
 - Cider 3.1 or later for host integration checks; verify Cider 4 behavior for host-version-sensitive changes

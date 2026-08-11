@@ -43,6 +43,11 @@ Set-PackageVersion -Path (Join-Path $repositoryRoot "plugin/package.json") -Valu
 
 Push-Location $repositoryRoot
 try {
+    & corepack pnpm --filter '@cider-netease/shared' build
+    if ($LASTEXITCODE -ne 0) {
+        throw "Shared package build failed; no release archive was created."
+    }
+
     & corepack pnpm --filter '@cider-netease/plugin' test
     if ($LASTEXITCODE -ne 0) {
         throw "Plugin tests failed; no release archive was created."
