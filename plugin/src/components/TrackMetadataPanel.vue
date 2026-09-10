@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import type { TrackQuery } from "@cider-netease/shared";
 import { readCiderLanguage, resolveLocale, translate, type MessageKey } from "../i18n/settings-i18n";
 import { lyricState } from "../stores/lyric-store";
@@ -14,6 +14,7 @@ const t = (key: MessageKey) => translate(locale.value, key);
 const metadata = ref<TrackMetadata>(metadataFromMediaItem(readCurrentMediaItem(), props.track));
 const status = ref<"loading" | "ready" | "error">("loading");
 const requestError = ref(false);
+const metadataClose = ref<HTMLButtonElement>();
 let loadGeneration = 0;
 
 const identity = computed(() => {
@@ -80,7 +81,10 @@ async function loadMetadata(): Promise<void> {
 }
 
 watch(identity, () => { void loadMetadata(); });
-onMounted(() => { void loadMetadata(); });
+onMounted(() => {
+  void loadMetadata();
+  void nextTick(() => metadataClose.value?.focus());
+});
 onBeforeUnmount(() => { loadGeneration += 1; requestError.value = false; });
 </script>
 
@@ -91,24 +95,26 @@ onBeforeUnmount(() => { loadGeneration += 1; requestError.value = false; });
         <span class="metadata-kicker">{{ t("metadata.kicker") }}</span>
         <h2>{{ t("metadata.panelTitle") }}</h2>
       </div>
-      <button type="button" class="metadata-close" :aria-label="t('metadata.close')" @click="emit('close')">×</button>
+      <button ref="metadataClose" type="button" class="metadata-close" :aria-label="t('metadata.close')" @click="emit('close')">×</button>
     </header>
 
     <div v-if="status === 'loading'" class="metadata-state" role="status">
       <span class="metadata-spinner" aria-hidden="true"></span>
       <span>{{ t("metadata.loading") }}</span>
     </div>
-    <div v-else-if="status === 'error'" class="metadata-state error" role="alert">
-      <span>{{ t("metadata.error") }}</span>
-      <button type="button" @click="loadMetadata">{{ t("metadata.retry") }}</button>
-    </div>
-    <dl v-else-if="fields.length" class="metadata-list">
-      <template v-for="field in fields" :key="field.key">
-        <dt>{{ field.label }}</dt>
-        <dd>{{ field.value }}</dd>
-      </template>
-    </dl>
-    <p v-else class="metadata-state" role="status">{{ t("metadata.empty") }}</p>
+    <template v-else>
+      <div v-if="status === 'error'" class="metadata-state error" role="alert">
+        <span>{{ t("metadata.error") }}</span>
+        <button type="button" @click="loadMetadata">{{ t("metadata.retry") }}</button>
+      </div>
+      <dl v-if="fields.length" class="metadata-list">
+        <template v-for="field in fields" :key="field.key">
+          <dt>{{ field.label }}</dt>
+          <dd>{{ field.value }}</dd>
+        </template>
+      </dl>
+      <p v-else class="metadata-state" role="status">{{ t("metadata.empty") }}</p>
+    </template>
 
     <p v-if="requestError" class="metadata-footnote">{{ t("metadata.partial") }}</p>
   </section>

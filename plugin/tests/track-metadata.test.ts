@@ -70,4 +70,27 @@ describe("track metadata", () => {
     await expect(service.load(track)).resolves.toMatchObject({ releaseDate: "2024-01-01" });
     expect(fetcher).toHaveBeenCalledTimes(2);
   });
+
+  it("invalidates cleared requests without deleting a replacement request", async () => {
+    vi.spyOn(AppleMusic, "nowPlayingItem", "get").mockReturnValue({ id: "song-4", attributes: { name: "Song", artistName: "Artist" } });
+    let resolveFirst: (value: unknown) => void = () => undefined;
+    let resolveSecond: (value: unknown) => void = () => undefined;
+    const fetcher = vi.fn()
+      .mockImplementationOnce(() => new Promise((resolve) => { resolveFirst = resolve; }))
+      .mockImplementationOnce(() => new Promise((resolve) => { resolveSecond = resolve; }));
+    const service = new TrackMetadataService(fetcher);
+    const track = { title: "Song", artist: "Artist", album: "", appleMusicId: "song-4" };
+
+    const firstRequest = service.load(track);
+    service.clear();
+    const secondRequest = service.load(track);
+    expect(fetcher).toHaveBeenCalledTimes(2);
+
+    resolveFirst({ attributes: { composerName: "Old composer" } });
+    await expect(firstRequest).resolves.toMatchObject({ composer: "Old composer" });
+    resolveSecond({ attributes: { composerName: "New composer" } });
+    await expect(secondRequest).resolves.toMatchObject({ composer: "New composer" });
+    await expect(service.load(track)).resolves.toMatchObject({ composer: "New composer" });
+    expect(fetcher).toHaveBeenCalledTimes(2);
+  });
 });

@@ -5,7 +5,7 @@ import PluginSettings from "./components/PluginSettings.vue";
 import { readCiderLanguage, resolveLocale } from "./i18n/settings-i18n";
 import pluginConfig from "./plugin.config";
 import { lyricController } from "./stores/lyric-store";
-import { bindSettings, STORED_DEFAULT_SETTINGS, type StoredPluginSettings } from "./stores/settings-store";
+import { bindSettings, migrateSettings, STORED_DEFAULT_SETTINGS, type StoredPluginSettings } from "./stores/settings-store";
 
 export const CustomElements = {
   settings: defineCustomElement(PluginSettings, { shadowRoot: false }),
@@ -45,7 +45,8 @@ const context = definePluginContext({
 });
 
 const config = context.setupConfig<StoredPluginSettings>({ ...STORED_DEFAULT_SETTINGS });
-const initialLocale = resolveLocale(config.value.locale, readCiderLanguage());
+const migratedSettings = migrateSettings(config.value);
+const initialLocale = resolveLocale(migratedSettings.locale, readCiderLanguage());
 bindSettings(config, initialLocale === "zh-TW");
 context.plugin.SettingsElement = context.customElementName("settings");
 

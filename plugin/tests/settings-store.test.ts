@@ -8,6 +8,7 @@ import {
   settings,
   STORED_DEFAULT_SETTINGS,
 } from "../src/stores/settings-store";
+import { resolveLocale } from "../src/i18n/settings-i18n";
 
 afterEach(() => {
   vi.useRealTimers();
@@ -31,6 +32,7 @@ describe("plugin settings persistence", () => {
     });
     expect(migrateSettings({ locale: "zh-TW" }).locale).toBe("zh-TW");
     expect(migrateSettings({ locale: "unsupported" as never }).locale).toBe("auto");
+    expect(resolveLocale(migrateSettings({ locale: "unsupported" as never }).locale, "zh-TW")).toBe("zh-TW");
     expect(migrateSettings({}, true).convertLyricsToTraditional).toBe(true);
     expect(migrateSettings({}, false).convertLyricsToTraditional).toBe(false);
     expect(migrateSettings({ convertLyricsToTraditional: false }, true).convertLyricsToTraditional).toBe(false);

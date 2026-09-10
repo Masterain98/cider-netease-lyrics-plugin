@@ -137,6 +137,7 @@ export async function fetchCatalogSong(appleMusicId: string): Promise<unknown> {
 export class TrackMetadataService {
   private readonly cache = new Map<string, TrackMetadata>();
   private readonly pending = new Map<string, Promise<TrackMetadata>>();
+  private invalidationGeneration = 0;
 
   constructor(private readonly fetcher: TrackMetadataFetcher = fetchCatalogSong) {}
 
@@ -152,18 +153,23 @@ export class TrackMetadataService {
     if (cached) return mergeTrackMetadata(base, cached);
     const existing = this.pending.get(id);
     if (existing) return mergeTrackMetadata(base, await existing);
+    const generation = this.invalidationGeneration;
     const request = this.fetcher(id)
       .then((resource) => {
         const metadata = metadataFromMediaItem(resource, track);
-        this.cache.set(id, metadata);
+        if (generation === this.invalidationGeneration) this.cache.set(id, metadata);
         return metadata;
-      })
-      .finally(() => this.pending.delete(id));
+      });
     this.pending.set(id, request);
-    return mergeTrackMetadata(base, await request);
+    try {
+      return mergeTrackMetadata(base, await request);
+    } finally {
+      if (this.pending.get(id) === request) this.pending.delete(id);
+    }
   }
 
   clear(): void {
+    this.invalidationGeneration += 1;
     this.cache.clear();
     this.pending.clear();
   }
