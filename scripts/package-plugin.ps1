@@ -63,22 +63,55 @@ finally {
 }
 
 $distDirectory = Join-Path $repositoryRoot "plugin/dist"
-$releaseFiles = [ordered]@{
-    "plugin.js" = Join-Path $distDirectory "plugin.js"
-    "plugin.yml" = Join-Path $distDirectory "plugin.yml"
-    "icon.png" = Join-Path $distDirectory "icon.png"
-}
+$requiredReleasePaths = @(
+    "plugin.js",
+    "plugin.yml",
+    "icon.png",
+    "THIRD_PARTY_LICENSES.txt"
+)
+$distFiles = @(Get-ChildItem -LiteralPath $distDirectory -File -Recurse | ForEach-Object {
+    [PSCustomObject]@{
+        ArchivePath = [System.IO.Path]::GetRelativePath($distDirectory, $_.FullName).Replace('\', '/')
+        SourcePath = $_.FullName
+    }
+})
 
-foreach ($entry in $releaseFiles.GetEnumerator()) {
-    if (-not [System.IO.File]::Exists($entry.Value)) {
-        throw "Required plugin file is missing: $($entry.Value)"
+foreach ($requiredPath in $requiredReleasePaths) {
+    if ($requiredPath -notin $distFiles.ArchivePath) {
+        throw "Required plugin file is missing: $requiredPath"
     }
 }
 
-$manifest = [System.IO.File]::ReadAllText($releaseFiles["plugin.yml"])
+$dynamicChunks = @($distFiles | Where-Object { $_.ArchivePath -match '^assets/cn2t-[A-Za-z0-9_-]+\.js$' })
+if ($dynamicChunks.Count -ne 1) {
+    throw "Expected exactly one hashed OpenCC chunk under assets/, found $($dynamicChunks.Count)."
+}
+
+$allowedReleasePaths = @($requiredReleasePaths) + @($dynamicChunks.ArchivePath)
+$unexpectedFiles = @($distFiles | Where-Object { $_.ArchivePath -notin $allowedReleasePaths })
+if ($unexpectedFiles.Count -gt 0) {
+    throw "Unexpected files in plugin dist: $($unexpectedFiles.ArchivePath -join ', ')"
+}
+
+$releaseFiles = @($distFiles | Where-Object { $_.ArchivePath -in $allowedReleasePaths } | Sort-Object ArchivePath)
+foreach ($entry in $releaseFiles) {
+    $segments = $entry.ArchivePath -split '/'
+    if ([System.IO.Path]::IsPathRooted($entry.ArchivePath) -or $segments -contains '..') {
+        throw "Unsafe plugin archive path: $($entry.ArchivePath)"
+    }
+}
+
+$manifestPath = ($releaseFiles | Where-Object ArchivePath -eq "plugin.yml").SourcePath
+$manifest = [System.IO.File]::ReadAllText($manifestPath)
 $escapedVersion = [System.Text.RegularExpressions.Regex]::Escape($version)
 if ($manifest -notmatch "(?m)^version:\s*$escapedVersion\s*$") {
     throw "Built plugin.yml does not contain version $version."
+}
+
+$pluginEntryPath = ($releaseFiles | Where-Object ArchivePath -eq "plugin.js").SourcePath
+$pluginEntry = [System.IO.File]::ReadAllText($pluginEntryPath)
+if (-not $pluginEntry.Contains($dynamicChunks[0].ArchivePath)) {
+    throw "plugin.js does not reference the packaged OpenCC chunk $($dynamicChunks[0].ArchivePath)."
 }
 
 $outputPath = if ([System.IO.Path]::IsPathRooted($OutputDirectory)) {
@@ -108,10 +141,10 @@ try {
         [System.IO.Compression.ZipArchiveMode]::Create,
         $false
     )
-    foreach ($entry in $releaseFiles.GetEnumerator()) {
-        $zipEntry = $archive.CreateEntry($entry.Key, [System.IO.Compression.CompressionLevel]::Optimal)
+    foreach ($entry in $releaseFiles) {
+        $zipEntry = $archive.CreateEntry($entry.ArchivePath, [System.IO.Compression.CompressionLevel]::Optimal)
         $destination = $zipEntry.Open()
-        $source = [System.IO.File]::OpenRead($entry.Value)
+        $source = [System.IO.File]::OpenRead($entry.SourcePath)
         try {
             $source.CopyTo($destination)
         }

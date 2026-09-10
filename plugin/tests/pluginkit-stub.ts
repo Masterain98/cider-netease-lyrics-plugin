@@ -9,6 +9,8 @@ export class AppleMusic {
 
 export const saveConfig = vi.fn(async (): Promise<void> => undefined);
 
+export const v3 = vi.fn(async () => ({ data: { data: null } }));
+
 export function definePluginContext<T extends Record<string, unknown>>(plugin: T) {
   return {
     plugin,

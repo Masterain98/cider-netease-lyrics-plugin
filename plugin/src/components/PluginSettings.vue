@@ -15,6 +15,7 @@ import { PluginError, type PluginErrorCode } from "../domain/errors";
 import { lyricState } from "../stores/lyric-store";
 import { MappingStore, type MappingRecord } from "../stores/mapping-store";
 import { settings } from "../stores/settings-store";
+import { traditionalLyricsConverter } from "../utils/traditional-lyrics";
 
 type ConnectionResult =
   | { state: "idle" }
@@ -210,7 +211,22 @@ async function deleteMapping(trackKey: string) {
   await refreshMappings();
 }
 
+function loadTraditionalLyricsConverter() {
+  void traditionalLyricsConverter.load().catch(() => undefined);
+}
+
+function retryTraditionalLyricsConverter() {
+  void traditionalLyricsConverter.retry().catch(() => undefined);
+}
+
 watch(() => settings.connectionMode, () => { connectionResult.value = { state: "idle" }; });
+watch(
+  () => settings.convertLyricsToTraditional,
+  (enabled) => {
+    if (enabled) loadTraditionalLyricsConverter();
+  },
+  { immediate: true },
+);
 onMounted(() => {
   void refreshMappings();
   document.addEventListener("pointerdown", closeLanguageMenu);
@@ -336,6 +352,16 @@ onBeforeUnmount(() => document.removeEventListener("pointerdown", closeLanguageM
           <label class="toggle-row"><span><strong>{{ t("lyrics.original.title") }}</strong></span><input v-model="settings.showOriginal" type="checkbox" /><i aria-hidden="true"></i></label>
           <label class="toggle-row"><span><strong>{{ t("lyrics.translation.title") }}</strong></span><input v-model="settings.showTranslation" type="checkbox" /><i aria-hidden="true"></i></label>
           <label class="toggle-row"><span><strong>{{ t("lyrics.chineseOnly.title") }}</strong><small>{{ t("lyrics.chineseOnly.description") }}</small></span><input v-model="settings.chineseTranslationOnly" type="checkbox" /><i aria-hidden="true"></i></label>
+          <label class="toggle-row"><span><strong>{{ t("lyrics.traditional.title") }}</strong><small>{{ t("lyrics.traditional.description") }}</small></span><input v-model="settings.convertLyricsToTraditional" type="checkbox" /><i aria-hidden="true"></i></label>
+        </div>
+        <div
+          v-if="settings.convertLyricsToTraditional && ['loading', 'error'].includes(traditionalLyricsConverter.state.status)"
+          class="conversion-notice"
+          :data-state="traditionalLyricsConverter.state.status"
+          :role="traditionalLyricsConverter.state.status === 'error' ? 'alert' : 'status'"
+        >
+          <span>{{ t(traditionalLyricsConverter.state.status === "error" ? "lyrics.traditional.error" : "lyrics.traditional.loading") }}</span>
+          <button v-if="traditionalLyricsConverter.state.status === 'error'" type="button" class="link" @click="retryTraditionalLyricsConverter">{{ t("lyrics.traditional.retry") }}</button>
         </div>
         <div class="range-grid">
           <label class="range-field"><span><b>{{ t("lyrics.lyricSize") }}</b><output>{{ Math.round(settings.originalFontSize * 100) }}%</output></span><input v-model.number="settings.originalFontSize" :aria-label="t('lyrics.lyricSize')" :style="{ '--range-progress': `${((settings.originalFontSize - 0.8) / 0.4) * 100}%` }" type="range" min="0.8" max="1.2" step="0.05" /></label>
@@ -510,6 +536,9 @@ button.primary:hover:not(:disabled) { background: var(--cnl-red-strong); }
 .toggle-row input:checked + i, .cache-toggle input:checked + i { background: var(--cnl-red); }
 .toggle-row input:checked + i::after, .cache-toggle input:checked + i::after { background: #fff; transform: translateX(.86rem); }
 .toggle-row input:focus-visible + i, .cache-toggle input:focus-visible + i { outline: 2px solid var(--cnl-red-strong); outline-offset: 3px; }
+.conversion-notice { display: flex; align-items: center; justify-content: space-between; gap: .8rem; margin: .55rem 0 .8rem; padding: .62rem .72rem; border-radius: .72rem; color: var(--cnl-muted); background: var(--cnl-faint); font-size: .74rem; line-height: 1.4; }
+.conversion-notice[data-state="error"] { color: var(--cnl-red-strong); background: color-mix(in srgb, var(--cnl-red) 9%, transparent); }
+.conversion-notice button { flex: 0 0 auto; padding: .28rem .38rem; color: inherit; }
 .range-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; padding-top: 1rem; border-top: 1px solid var(--cnl-line-soft); }
 .range-field { display: grid; gap: .6rem; }
 .range-field.wide { grid-column: 1 / -1; }
