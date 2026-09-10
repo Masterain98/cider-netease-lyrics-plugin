@@ -5,6 +5,7 @@ import { canSeekPlayback, getPlaybackTime, seekPlayback } from "../adapters/play
 import { readCiderLanguage, resolveLocale, translate, type MessageKey } from "../i18n/settings-i18n";
 import { settings } from "../stores/settings-store";
 import { findCurrentLine } from "../utils/current-line";
+import { traditionalLyricsConverter } from "../utils/traditional-lyrics";
 
 const props = defineProps<{ lines: LyricLine[]; translationIsChinese: boolean }>();
 const locale = computed(() => resolveLocale(settings.locale, readCiderLanguage()));
@@ -20,7 +21,11 @@ let resumeTimer: ReturnType<typeof setTimeout> | undefined;
 const virtualization = computed(() => props.lines.length > 240);
 const startIndex = computed(() => (virtualization.value ? Math.max(0, activeIndex.value - 45) : 0));
 const endIndex = computed(() => (virtualization.value ? Math.min(props.lines.length, Math.max(activeIndex.value + 70, 115)) : props.lines.length));
-const visibleLines = computed(() => props.lines.slice(startIndex.value, endIndex.value));
+const displayLines = computed(() => {
+  if (!settings.convertLyricsToTraditional || traditionalLyricsConverter.state.status !== "ready") return props.lines;
+  return traditionalLyricsConverter.convertLines(props.lines);
+});
+const visibleLines = computed(() => displayLines.value.slice(startIndex.value, endIndex.value));
 const estimatedHeight = 92;
 const topSpacer = computed(() => startIndex.value * estimatedHeight);
 const bottomSpacer = computed(() => (props.lines.length - endIndex.value) * estimatedHeight);
@@ -80,6 +85,13 @@ function seek(line: LyricLine) {
 
 watch(activeIndex, followActiveLine);
 watch(() => props.lines, () => { activeIndex.value = findCurrentLine(props.lines, getPlaybackTime()); }, { immediate: true });
+watch(
+  () => settings.convertLyricsToTraditional,
+  (enabled) => {
+    if (enabled) void traditionalLyricsConverter.load().catch(() => undefined);
+  },
+  { immediate: true },
+);
 onMounted(() => { frame = requestAnimationFrame(tick); });
 onBeforeUnmount(() => {
   cancelAnimationFrame(frame);

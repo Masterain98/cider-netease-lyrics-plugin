@@ -18,6 +18,14 @@ function finiteNumber(...values: unknown[]): number | undefined {
   return values.find((value): value is number => typeof value === "number" && Number.isFinite(value) && value > 0);
 }
 
+export function readCurrentMediaItem(): unknown {
+  try {
+    return AppleMusic.nowPlayingItem;
+  } catch {
+    return getFallbackNowPlayingItem();
+  }
+}
+
 export function trackQueryFromMediaItem(item: unknown): TrackQuery | null {
   const media = record(item);
   const attributes = record(media.attributes);
@@ -88,11 +96,7 @@ export class CiderTrackAdapter {
   }
 
   private readItem(): unknown {
-    try {
-      return AppleMusic.nowPlayingItem;
-    } catch {
-      return getFallbackNowPlayingItem();
-    }
+    return readCurrentMediaItem();
   }
 
   private scheduleCheck(): void {

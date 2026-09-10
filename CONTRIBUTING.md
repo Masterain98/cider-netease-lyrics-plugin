@@ -57,7 +57,7 @@ When changing shared matching or parsing, run shared tests as well. When changin
 pwsh -NoProfile -File ./scripts/package-plugin.ps1
 ```
 
-The script synchronizes manifest versions, runs plugin checks, builds the plugin, and writes a ZIP plus checksum to `artifacts/`. The ZIP contains only the Cider plugin runtime files—never gateway source, configuration, or dependencies.
+The script synchronizes manifest versions, runs plugin checks, builds the plugin, and writes a ZIP plus checksum to `artifacts/`. The ZIP contains the plugin entry, manifest, icon, approved lazy runtime chunks, and third-party notices. It never contains gateway source, configuration, source maps, or dependency trees.
 
 ## Pull request checklist
 

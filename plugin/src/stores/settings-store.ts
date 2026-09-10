@@ -13,6 +13,7 @@ export interface PluginSettings {
   showOriginal: boolean;
   showTranslation: boolean;
   chineseTranslationOnly: boolean;
+  convertLyricsToTraditional: boolean;
   originalFontSize: number;
   lyricScale: number;
   translationFontSize: number;
@@ -23,6 +24,11 @@ export interface PluginSettings {
   cacheTtlDays: number;
 }
 
+export type StoredPluginSettings = Omit<PluginSettings, "convertLyricsToTraditional"> & {
+  // Null is a one-time migration sentinel resolved from the effective UI locale.
+  convertLyricsToTraditional: boolean | null;
+};
+
 export const DEFAULT_SETTINGS: PluginSettings = {
   locale: "auto",
   autoMatch: true,
@@ -32,6 +38,7 @@ export const DEFAULT_SETTINGS: PluginSettings = {
   showOriginal: true,
   showTranslation: true,
   chineseTranslationOnly: true,
+  convertLyricsToTraditional: false,
   originalFontSize: 1,
   lyricScale: 1,
   translationFontSize: 0.62,
@@ -42,10 +49,18 @@ export const DEFAULT_SETTINGS: PluginSettings = {
   cacheTtlDays: 14,
 };
 
+export const STORED_DEFAULT_SETTINGS: StoredPluginSettings = {
+  ...DEFAULT_SETTINGS,
+  convertLyricsToTraditional: null,
+};
+
 export const settings = reactive<PluginSettings>({ ...DEFAULT_SETTINGS });
 let bound = false;
 
-export function migrateSettings(value: Partial<PluginSettings>): PluginSettings {
+export function migrateSettings(
+  value: Partial<StoredPluginSettings>,
+  defaultTraditionalLyrics = false,
+): PluginSettings {
   const supportedLocales: SettingsLocale[] = ["auto", "zh-CN", "zh-TW", "en-US"];
   const legacyLyricScale = typeof value.lyricScale === "number" && Number.isFinite(value.lyricScale)
     ? Math.min(1.2, Math.max(0.8, value.lyricScale))
@@ -61,6 +76,9 @@ export function migrateSettings(value: Partial<PluginSettings>): PluginSettings 
     ...value,
     locale: supportedLocales.includes(value.locale as SettingsLocale) ? value.locale as SettingsLocale : "auto",
     connectionMode: value.connectionMode === "gateway" ? "gateway" : "direct",
+    convertLyricsToTraditional: typeof value.convertLyricsToTraditional === "boolean"
+      ? value.convertLyricsToTraditional
+      : defaultTraditionalLyrics,
     originalFontSize,
     // Keep the legacy field populated so older Cider config snapshots remain readable.
     lyricScale: originalFontSize,
@@ -68,11 +86,13 @@ export function migrateSettings(value: Partial<PluginSettings>): PluginSettings 
   };
 }
 
-export function bindSettings(config: Ref<PluginSettings>): void {
+export function bindSettings(config: Ref<StoredPluginSettings>, defaultTraditionalLyrics = false): void {
   if (bound) return;
   bound = true;
-  Object.assign(settings, migrateSettings(config.value));
+  const needsTraditionalLyricsInitialization = typeof config.value.convertLyricsToTraditional !== "boolean";
+  Object.assign(settings, migrateSettings(config.value, defaultTraditionalLyrics));
   Object.assign(config.value, settings);
+  if (needsTraditionalLyricsInitialization) void saveConfig();
   let saveTimer: ReturnType<typeof setTimeout> | undefined;
   watch(
     settings,
