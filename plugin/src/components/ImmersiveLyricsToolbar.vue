@@ -5,7 +5,6 @@ import { lyricController, lyricState } from "../stores/lyric-store";
 import { settings } from "../stores/settings-store";
 import TrackMetadataPanel from "./TrackMetadataPanel.vue";
 
-const pinned = ref(false);
 const customOpen = ref(false);
 const metadataOpen = ref(false);
 const quickTools = ref<HTMLElement>();
@@ -42,12 +41,7 @@ function resetSizes() {
   settings.translationFontSize = 0.62;
 }
 
-function togglePinned() {
-  pinned.value = !pinned.value;
-}
-
 function close() {
-  pinned.value = false;
   customOpen.value = false;
   closeMetadata();
 }
@@ -91,15 +85,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <aside ref="quickTools" class="quick-tools" :class="{ pinned }" :aria-label="t('quickTools.open')" @keydown.esc="close">
-    <button
-      type="button"
-      class="edge-trigger"
-      :aria-label="pinned ? t('quickTools.close') : t('quickTools.open')"
-      :aria-expanded="pinned"
-      @click="togglePinned"
-    ><span aria-hidden="true"></span></button>
-
+  <aside ref="quickTools" class="quick-tools" :aria-label="t('quickTools.open')" @keydown.esc="close">
     <nav class="tool-rail" :aria-label="t('quickTools.open')">
       <button
         type="button"
@@ -137,7 +123,6 @@ onBeforeUnmount(() => {
       <button
         type="button"
         class="tool-button glyph-button text-glyph-button"
-        :class="{ active: settings.convertLyricsToTraditional }"
         :data-tooltip="settings.convertLyricsToTraditional ? t('quickTools.switchToSimplified') : t('quickTools.switchToTraditional')"
         :aria-label="settings.convertLyricsToTraditional ? t('quickTools.switchToSimplified') : t('quickTools.switchToTraditional')"
         :aria-pressed="settings.convertLyricsToTraditional"
@@ -238,42 +223,43 @@ onBeforeUnmount(() => {
   --rail-spring: cubic-bezier(.22, 1, .36, 1);
   position: absolute;
   z-index: 8;
-  top: 50%;
-  right: 0;
-  bottom: auto;
-  display: flex;
-  width: 5.2rem;
+  top: auto;
+  right: clamp(.6rem, 1.6vw, 1.5rem);
+  bottom: clamp(1.5rem, 5vh, 3.75rem);
+  display: block;
+  box-sizing: border-box;
+  width: 3.25rem;
+  padding: .34rem .3rem;
+  border: 1px solid rgb(255 255 255 / 8%);
+  border-radius: 1.8rem;
+  background: rgb(255 255 255 / 2.5%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 7%), 0 .8rem 2.5rem rgb(0 0 0 / 18%);
   align-self: start;
   align-items: center;
   justify-self: end;
-  justify-content: flex-end;
   overflow: visible;
-  transform: translateY(-50%);
+  transform: none;
+  -webkit-backdrop-filter: blur(18px) saturate(115%);
+  backdrop-filter: blur(18px) saturate(115%);
 }
-.edge-trigger { position: absolute; z-index: 2; right: 0; display: grid; width: 1.15rem; height: 4.5rem; place-items: center; border: 0; padding: 0; color: white; background: transparent; cursor: pointer; }
-.edge-trigger span { width: .18rem; height: 2.5rem; border-radius: 999px 0 0 999px; background: rgb(255 255 255 / 18%); box-shadow: 0 0 0 0 rgb(231 43 66 / 0%); transition: height 420ms var(--rail-spring), width 420ms var(--rail-spring), background 320ms ease, box-shadow 420ms ease; }
-.quick-tools:hover .edge-trigger span, .quick-tools:focus-within .edge-trigger span, .quick-tools.pinned .edge-trigger span { width: .24rem; height: 3.2rem; background: var(--rail-red); box-shadow: 0 0 1.5rem rgb(231 43 66 / 58%); }
-.edge-trigger:focus-visible { outline: none; }
-.edge-trigger:focus-visible span { outline: .13rem solid white; outline-offset: .2rem; }
-.tool-rail { display: grid; justify-items: center; gap: .38rem; margin-right: 1rem; padding: .52rem; border: 1px solid rgb(255 255 255 / 10%); border-radius: 1.3rem; background: rgb(13 12 16 / 72%); box-shadow: inset 0 1px 0 rgb(255 255 255 / 10%), 0 1.4rem 4rem rgb(0 0 0 / 34%); opacity: 0; pointer-events: none; transform: translateX(1.1rem) scale(.94); transform-origin: right center; backdrop-filter: blur(22px) saturate(130%); transition: opacity 260ms ease .28s, transform 440ms var(--rail-spring) .28s;
-}
-.quick-tools:hover .tool-rail, .quick-tools:focus-within .tool-rail, .quick-tools.pinned .tool-rail { opacity: 1; pointer-events: auto; transform: none; transition-delay: 0s; }
-.tool-button { position: relative; display: grid; width: 2.65rem; height: 2.65rem; place-items: center; border: 1px solid transparent; border-radius: .92rem; padding: 0; color: rgb(255 255 255 / 48%); background: transparent; font: inherit; cursor: pointer; transition: color 260ms ease, border-color 260ms ease, background 260ms ease, transform 380ms var(--rail-spring), box-shadow 380ms ease; }
-.tool-button:hover { color: white; border-color: rgb(255 255 255 / 11%); background: rgb(255 255 255 / 8%); transform: scale(1.06); }
+.tool-rail { display: grid; justify-items: center; gap: .14rem; width: 100%; padding: 0; }
+.tool-button { position: relative; display: grid; width: 2.65rem; height: 2.65rem; place-items: center; border: 1px solid transparent; border-radius: 50%; padding: 0; color: rgb(255 255 255 / 86%); background: transparent; opacity: .68; font: inherit; cursor: pointer; transition: color 260ms ease, opacity 260ms ease, border-color 260ms ease, background 260ms ease, transform 380ms var(--rail-spring), box-shadow 380ms ease; }
+.tool-button:hover, .tool-button:focus-visible { color: white; border-color: rgb(255 255 255 / 28%); background: rgb(255 255 255 / 9%); opacity: 1; transform: scale(1.05); box-shadow: 0 .45rem 1.4rem rgb(3 3 8 / 18%); }
 .tool-button:active { transform: scale(.93); }
 .tool-button:focus-visible { outline: .13rem solid white; outline-offset: .15rem; }
-.tool-button.active { color: white; border-color: rgb(231 43 66 / 42%); background: rgb(231 43 66 / 68%); box-shadow: inset 0 1px 0 rgb(255 255 255 / 20%), 0 .55rem 1.5rem rgb(126 8 28 / 24%); }
+.tool-button.active { color: rgb(255 255 255 / 90%); border-color: rgb(231 43 66 / 68%); background: transparent; opacity: .58; box-shadow: 0 0 .7rem rgb(231 43 66 / 14%); }
+.tool-button.active:hover, .tool-button.active:focus-visible { opacity: 1; border-color: rgb(231 43 66 / 92%); background: transparent; box-shadow: 0 .45rem 1.25rem rgb(126 8 28 / 24%); }
 .tool-button:disabled { opacity: .24; cursor: default; transform: none; }
 .tool-button::before { position: absolute; top: 50%; right: calc(100% + .7rem); max-width: 14rem; padding: .46rem .62rem; border: 1px solid rgb(255 255 255 / 9%); border-radius: .6rem; color: rgb(255 255 255 / 86%); background: rgb(13 12 16 / 88%); box-shadow: 0 .7rem 2rem rgb(0 0 0 / 24%); content: attr(data-tooltip); font-size: .68rem; font-weight: 620; line-height: 1.3; opacity: 0; pointer-events: none; transform: translate(.35rem, -50%); white-space: nowrap; backdrop-filter: blur(14px); transition: opacity 180ms ease, transform 280ms var(--rail-spring); }
 .tool-button:hover::before, .tool-button:focus-visible::before { opacity: 1; transform: translate(0, -50%); }
-.size-button span { font-size: .72rem; font-weight: 720; letter-spacing: -.03em; }
-.glyph-button span { font-family: Pretendard, "Segoe UI", sans-serif; font-size: 1rem; font-weight: 650; }
-.tool-button svg { width: 1.12rem; height: 1.12rem; fill: none; stroke: currentColor; stroke-width: 1.65; stroke-linecap: round; stroke-linejoin: round; }
-.customize-button svg { width: 1.22rem; height: 1.22rem; stroke-width: 1.45; }
+.size-button span { font-size: .68rem; font-weight: 680; letter-spacing: -.03em; }
+.glyph-button span { font-family: Pretendard, "Segoe UI", sans-serif; font-size: .94rem; font-weight: 620; }
+.tool-button svg { width: 1.08rem; height: 1.08rem; fill: none; stroke: currentColor; stroke-width: 1.65; stroke-linecap: round; stroke-linejoin: round; }
+.customize-button svg { width: 1.18rem; height: 1.18rem; stroke-width: 1.45; }
 .rematch-button:hover svg { transform: rotate(-38deg); transition: transform 520ms var(--rail-spring); }
 .rematch-button.busy svg { animation: spin 1.1s linear infinite; }
-.divider { width: 1.35rem; height: 1px; margin-block: .08rem; background: rgb(255 255 255 / 10%); }
-.custom-panel { position: absolute; z-index: 4; top: 50%; right: 4.45rem; display: grid; width: min(17rem, calc(100vw - 6rem)); gap: 1rem; box-sizing: border-box; padding: 1rem; border: 1px solid rgb(255 255 255 / 13%); border-radius: 1.25rem; color: rgb(255 255 255 / 86%); background: rgb(13 12 16 / 91%); box-shadow: inset 0 1px 0 rgb(255 255 255 / 12%), 0 1.4rem 4rem rgb(0 0 0 / 38%); transform: translateY(-50%); backdrop-filter: blur(24px) saturate(135%); }
+.divider { width: 1.2rem; height: 1px; margin-block: .2rem; background: rgb(255 255 255 / 12%); }
+.custom-panel { position: absolute; z-index: 4; top: 50%; right: 3.85rem; display: grid; width: min(17rem, calc(100vw - 6rem)); gap: 1rem; box-sizing: border-box; padding: 1rem; border: 1px solid rgb(255 255 255 / 13%); border-radius: 1.25rem; color: rgb(255 255 255 / 86%); background: rgb(13 12 16 / 91%); box-shadow: inset 0 1px 0 rgb(255 255 255 / 12%), 0 1.4rem 4rem rgb(0 0 0 / 38%); transform: translateY(-50%); backdrop-filter: blur(24px) saturate(135%); }
 .custom-panel::after { position: absolute; top: 50%; right: -.42rem; width: .78rem; height: .78rem; border-top: 1px solid rgb(255 255 255 / 13%); border-right: 1px solid rgb(255 255 255 / 13%); background: rgb(13 12 16 / 91%); content: ""; transform: translateY(-50%) rotate(45deg); }
 .custom-panel-header { display: flex; align-items: flex-start; justify-content: space-between; gap: .75rem; }
 .custom-panel-kicker { color: rgb(255 255 255 / 42%); font-size: .58rem; font-weight: 760; letter-spacing: .14em; }
@@ -296,7 +282,6 @@ onBeforeUnmount(() => {
 .custom-reset { justify-self: start; margin-top: .05rem; padding: .28rem .48rem; color: rgb(255 255 255 / 52%); background: transparent; font-size: .68rem; font-weight: 620; }
 .custom-reset:hover { color: #fff; background: rgb(255 255 255 / 7%); transform: none; }
 @keyframes spin { to { transform: rotate(360deg); } }
-@media (max-width: 900px) { .quick-tools { top: 50%; bottom: auto; width: 4.3rem; height: auto; transform: translateY(-50%); } .tool-rail { margin-right: .65rem; padding: .42rem; } .tool-button { width: 2.4rem; height: 2.4rem; border-radius: .82rem; } .custom-panel { right: 3.7rem; width: min(16.5rem, calc(100vw - 5rem)); } }
-@media (hover: none) { .edge-trigger span { width: .22rem; background: rgb(231 43 66 / 58%); } .quick-tools.pinned .tool-rail, .quick-tools:focus-within .tool-rail { opacity: 1; pointer-events: auto; transform: none; } }
-@media (prefers-reduced-motion: reduce) { .tool-rail, .edge-trigger span, .tool-button { transition-duration: .01ms !important; } .rematch-button.busy svg { animation-duration: 1.8s; } }
+@media (max-width: 900px) { .quick-tools { right: .55rem; bottom: clamp(5.75rem, 10vh, 7rem); width: 3.1rem; padding-inline: .3rem; } .tool-button { width: 2.5rem; height: 2.5rem; } .custom-panel { right: 3.55rem; width: min(16.5rem, calc(100vw - 5rem)); } }
+@media (prefers-reduced-motion: reduce) { .tool-button { transition-duration: .01ms !important; } .rematch-button.busy svg { animation-duration: 1.8s; } }
 </style>

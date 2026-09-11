@@ -7,7 +7,7 @@ import { settings } from "../stores/settings-store";
 import { findCurrentLine } from "../utils/current-line";
 import { traditionalLyricsConverter } from "../utils/traditional-lyrics";
 
-const props = defineProps<{ lines: LyricLine[]; translationIsChinese: boolean }>();
+const props = defineProps<{ lines: LyricLine[]; translationIsChinese: boolean; reserveToolbar?: boolean }>();
 const locale = computed(() => resolveLocale(settings.locale, readCiderLanguage()));
 const t = (key: MessageKey) => translate(locale.value, key);
 const activeIndex = ref(-1);
@@ -103,7 +103,7 @@ onBeforeUnmount(() => {
 <template>
   <div class="lyrics-shell">
     <button v-if="suspended && settings.autoScroll" class="resume" type="button" @click="resumeFollowing">{{ t("lyrics.resumeFollowing") }}</button>
-    <div ref="lyricsElement" class="lyrics" @wheel.passive="pauseFollowing" @touchstart.passive="pauseFollowing" @pointerdown="pauseFollowing">
+    <div ref="lyricsElement" class="lyrics" :class="{ 'with-toolbar': props.reserveToolbar }" @wheel.passive="pauseFollowing" @touchstart.passive="pauseFollowing" @pointerdown="pauseFollowing">
       <div v-if="topSpacer" :style="{ height: `${topSpacer}px` }" aria-hidden="true" />
       <button
         v-for="(line, visibleIndex) in visibleLines"
@@ -131,6 +131,7 @@ onBeforeUnmount(() => {
 <style scoped>
 .lyrics-shell { position: relative; min-height: 0; height: 100%; }
 .lyrics { height: 100%; overflow: auto; padding: 42vh clamp(1.25rem, 4vw, 4.75rem); scroll-behavior: smooth; scrollbar-width: none; mask-image: linear-gradient(to bottom, transparent 0, #000 13%, #000 84%, transparent 100%); }
+.lyrics.with-toolbar { padding-right: max(clamp(1.25rem, 4vw, 4.75rem), 6rem); }
 .lyrics::-webkit-scrollbar { display: none; }
 .lyric-line { position: relative; width: 100%; display: grid; gap: .24em; margin: .18rem 0; padding: .62rem 1rem .7rem 1.3rem; border: 0; border-radius: 1.15rem; color: inherit; text-align: left; background: transparent; opacity: .27; transform: translateX(0) scale(.955); transform-origin: left center; transition: opacity 520ms cubic-bezier(.22, 1, .36, 1), transform 620ms cubic-bezier(.22, 1, .36, 1), background 520ms cubic-bezier(.22, 1, .36, 1), box-shadow 520ms cubic-bezier(.22, 1, .36, 1); cursor: pointer; }
 .lyric-line::before { content: ""; position: absolute; top: 18%; bottom: 18%; left: .28rem; width: .2rem; border-radius: 999px; background: #ff4058; box-shadow: 0 0 1.4rem rgb(231 43 66 / 60%); opacity: 0; transform: scaleY(.35); transition: opacity 420ms cubic-bezier(.22, 1, .36, 1), transform 520ms cubic-bezier(.22, 1, .36, 1); }
@@ -147,6 +148,6 @@ onBeforeUnmount(() => {
 .resume:hover { transform: translateX(-50%) translateY(-2px); background: #ef334b; }
 .resume:active { transform: translateX(-50%) scale(.97); }
 .resume:focus-visible { outline: .14rem solid #fff; outline-offset: .18rem; }
-@media (max-width: 760px) { .lyrics { padding-inline: 1rem; } .lyric-line { padding-inline: 1rem; text-align: center; transform-origin: center; } .lyric-line::before { display: none; } .lyric-line:hover, .lyric-line.active { transform: scale(1); background: rgb(255 255 255 / 5%); } }
+@media (max-width: 760px) { .lyrics { padding-inline: 1rem; } .lyrics.with-toolbar { padding-right: 4.5rem; } .lyric-line { padding-inline: 1rem; text-align: center; transform-origin: center; } .lyric-line::before { display: none; } .lyric-line:hover, .lyric-line.active { transform: scale(1); background: rgb(255 255 255 / 5%); } }
 @media (prefers-reduced-motion: reduce) { .lyrics { scroll-behavior: auto; } .lyric-line { transition: none; } }
 </style>

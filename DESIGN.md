@@ -5,14 +5,14 @@ NetEase Bilingual Lyrics should feel like a thoughtful Cider immersive layout, n
 ## Product principles
 
 1. **Stay immersive.** Keep the main view calm, spacious, and readable during passive listening.
-2. **Reveal controls by proximity.** Put lyric actions beside lyrics and playback actions beside playback. Avoid sending routine tasks to plugin settings.
+2. **Keep controls close and quiet.** Put lyric actions beside lyrics and playback actions beside playback. Keep frequent actions available without allowing them to compete with the content, and avoid sending routine tasks to plugin settings.
 3. **Respect Cider.** Reuse Cider state and familiar interaction patterns while giving this layout a distinct NetEase lyric experience.
 4. **Avoid repetition.** A song title, album, source label, or section heading should not be repeated when its context is already clear.
 5. **Degrade gracefully.** Loading, missing lyrics, unavailable translations, narrow windows, and delayed host state must still look intentional.
 
 ## Visual language
 
-- Use NetEase red (`#E72B42` to `#FF4058`) as the main accent for selection, progress, focus, and important actions. It is an accent, not a large background fill.
+- Use NetEase red (`#E72B42` to `#FF4058`) as the main accent for selection, progress, focus, and important actions. It is an accent, not a large background fill; active lyric tools should prefer a restrained red outline over a filled control.
 - The immersive root remains transparent so Cider's selected background can show through. Use dark translucent glass, restrained blur, subtle borders, and soft shadows only where separation is needed.
 - Build hierarchy with opacity and weight: high-contrast active content, readable supporting content, and quiet metadata. Never make inactive lyrics so faint that they cannot be read.
 - Use Cider's effective system font stack. Keep labels compact, song titles confident, and lyric typography generous without oversized marketing-style headings.
@@ -23,7 +23,7 @@ NetEase Bilingual Lyrics should feel like a thoughtful Cider immersive layout, n
 
 - On wide windows, use a balanced artwork/metadata column and a flexible content column. Neither playback controls nor side groups may touch the window edge.
 - Keep previous, play/pause, and next visually centered as the core transport group. Place shuffle/repeat nearby and place DSP, Spatialization, favorite, volume, and fullscreen in compact secondary groups—not at distant edges.
-- Keep the right tool rail vertically centered in the usable lyric area. Reveal it smoothly when the pointer approaches; never cover the active lyric line.
+- Keep the right tool rail in the lower-right of the usable lyric area. It remains fully visible at low opacity, increases emphasis only for the hovered, focused, or active control, and never covers the active lyric line. A barely perceptible translucent surface may group the controls, but it must not read as a solid dark bar.
 - The top content switcher uses three peer destinations: Lyrics, Up Next, and History. Once selected, do not repeat the same destination as a large inner heading.
 - At narrow widths, reflow intentionally into a compact layout. Do not solve collisions by shrinking controls below comfortable pointer targets or by allowing overlap.
 

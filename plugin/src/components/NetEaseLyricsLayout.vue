@@ -101,6 +101,7 @@ watch(() => lyricState.source, () => { appleLyricsAvailability.value = "loading"
             v-else-if="lyricState.status === 'ready' && lyricState.lyrics"
             :lines="lyricState.lyrics.lyrics"
             :translation-is-chinese="lyricState.lyricDiagnostics?.translationIsChinese ?? false"
+            :reserve-toolbar="lyricState.source === 'netease'"
           />
           <MatchChooser v-else-if="lyricState.status === 'selecting-candidate'" />
           <LyricsStatus v-else />

@@ -18,6 +18,7 @@ This repository contains a plugin for Cider 3.1 and later (including Cider 4), s
 4. Add or update a regression test for behavior changes. Keep the browser preview useful for interaction and visual QA.
 5. Run focused checks first, then the complete relevant check set. Report known baseline failures separately from regressions.
 6. For visual changes, inspect both the immersive player and settings preview at wide and narrow sizes, in more than one locale.
+7. When testing Cider integration or immersive UI behavior, launch the local Cider build with CDP debugging enabled and verify the result through its CDP page target.
 
 ## Cider integration rules
 
